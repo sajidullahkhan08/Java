@@ -18,18 +18,6 @@ public class Student {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getFatherName() {
-        return father_name;
-    }
-
-    public void setFatherName(String father_name) {
-        this.father_name = father_name;
-    }
-
     public int getId() {
         return id;
     }
@@ -40,10 +28,6 @@ public class Student {
 
     public int getAge() {
         return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
     }
 
     public static Student findEldestStudent(Student[] students) {

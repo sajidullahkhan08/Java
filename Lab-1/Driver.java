@@ -15,7 +15,6 @@ public class Driver {
             System.out.println("No students found.");
         }
 
-        // Display IDs to verify uniqueness
         for (int i = 0; i < students.length; i++) {
             System.out.println("Student: " + students[i].getName() + ", ID: " + students[i].getId());
         }
