@@ -47,13 +47,13 @@ public class Student {
     }
 
     public static Student findEldestStudent(Student[] students) {
-        if (students == null || students.length == 0) {
+        Student eldest = students[0];
+        if (students.length == 0) {
             return null;
         }
-        Student eldest = students[0];
-        for (Student student : students) {
-            if (student.getAge() > eldest.getAge()) {
-                eldest = student;
+        for (int i = 1; i < students.length; i++) {
+            if (students[i].getAge() > eldest.getAge()) {
+                eldest = students[i];
             }
         }
         return eldest;
