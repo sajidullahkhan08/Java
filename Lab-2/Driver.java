@@ -14,5 +14,3 @@ public class Driver {
         ms.close();
     }
 }
-ah farag insaan hai
-wzwswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswswsz3ws
