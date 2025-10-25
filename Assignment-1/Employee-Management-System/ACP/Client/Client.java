@@ -63,6 +63,36 @@ public class Client {
         }
     }
 
+    private static void addNewEmployee() {
+        if (employeeCount >= 50) {
+            JOptionPane.showMessageDialog(null,
+                "Cannot add new employee!\n" +
+                "Maximum capacity of 50 employees reached!",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Employee newEmployee = new Employee();
+        boolean success = newEmployee.setEmpInformation();
+
+        if (success) {
+            employees[employeeCount] = newEmployee;
+            employeeCount++;
+            JOptionPane.showMessageDialog(null,
+                "Employee added successfully!\n" +
+                "Total Employees now: " + employeeCount + "/50",
+                "Success",
+                JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null,
+                "Failed to add employee!\n" +
+                "Please try again.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
     private static void exitProgram() {
         JOptionPane.showMessageDialog(null,
             "Thank you for using Employee Management System!\n" +
