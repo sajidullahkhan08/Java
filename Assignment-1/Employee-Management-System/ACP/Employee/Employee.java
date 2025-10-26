@@ -17,49 +17,38 @@ public class Employee implements Serializable {
     private int payScale;
     private String NIC;
     
-    // Static variable for auto-generating Emp ID
     private static int nextEmpID = 9000;
     
-    // Arrays for valid categories and education levels
     private static final String[] VALID_JOB_CATEGORIES = {"Teacher", "Officer", "Staff", "Labour"};
     private static final String[] VALID_EDUCATION_LEVELS = {"Matric", "FSc", "BS", "MS", "PhD"};
     
-    // Date format for parsing
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
     
-    // Default constructor
     public Employee() {
-        // Auto-generate Emp ID
         this.empID = nextEmpID++;
     }
     
-    // Constructor for loading from file (to set empID without incrementing counter)
     public Employee(int empID) {
         this.empID = empID;
-        // Update nextEmpID if this ID is higher
         if (empID >= nextEmpID) {
             nextEmpID = empID + 1;
         }
     }
     
-    // Main method to set employee information
     public boolean setEmpInformation() {
         try {
-            // Get employee name
             this.employeeName = JOptionPane.showInputDialog("Enter Employee Name:");
             if (this.employeeName == null || this.employeeName.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Employee Name cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
             
-            // Get father name
             this.fatherName = JOptionPane.showInputDialog("Enter Father's Name:");
             if (this.fatherName == null || this.fatherName.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Father's Name cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
             
-            // Get job category
             this.jobCategory = (String) JOptionPane.showInputDialog(
                 null,
                 "Select Job Category:",
@@ -75,7 +64,6 @@ public class Employee implements Serializable {
                 return false;
             }
             
-            // Get education level
             this.education = (String) JOptionPane.showInputDialog(
                 null,
                 "Select Education Level:",
@@ -91,12 +79,10 @@ public class Employee implements Serializable {
                 return false;
             }
             
-            // Validate education based on job category
             if (!validateEducationForJobCategory()) {
                 return false;
             }
             
-            // Get pay scale
             String payScaleStr = JOptionPane.showInputDialog("Enter Pay Scale (1-20):");
             if (payScaleStr == null) {
                 JOptionPane.showMessageDialog(null, "Pay Scale input cancelled!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -110,17 +96,14 @@ public class Employee implements Serializable {
                 return false;
             }
             
-            // Validate pay scale based on job category
             if (!validatePayScaleForJobCategory()) {
                 return false;
             }
             
-            // Get date of birth with proper parsing
             if (!setDateOfBirthFromInput()) {
                 return false;
             }
             
-            // Get NIC
             this.NIC = JOptionPane.showInputDialog("Enter NIC Number:");
             if (this.NIC == null || this.NIC.trim().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "NIC cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
@@ -143,7 +126,6 @@ public class Employee implements Serializable {
         }
     }
     
-    // Update employee information (only education, pay scale, and job category)
     public boolean updateEmpInformation() {
         JOptionPane.showMessageDialog(null, 
             "Current Employee Information:\n" + this.toString(),
@@ -151,7 +133,6 @@ public class Employee implements Serializable {
             JOptionPane.INFORMATION_MESSAGE);
         
         try {
-            // Get new job category
             String newJobCategory = (String) JOptionPane.showInputDialog(
                 null,
                 "Select New Job Category:\nCurrent: " + this.jobCategory,
@@ -167,7 +148,6 @@ public class Employee implements Serializable {
                 return false;
             }
             
-            // Get new education level
             String newEducation = (String) JOptionPane.showInputDialog(
                 null,
                 "Select New Education Level:\nCurrent: " + this.education,
@@ -183,7 +163,6 @@ public class Employee implements Serializable {
                 return false;
             }
             
-            // Get new pay scale
             String payScaleStr = JOptionPane.showInputDialog(
                 "Enter New Pay Scale (1-20):\nCurrent: " + this.payScale);
             
@@ -200,35 +179,28 @@ public class Employee implements Serializable {
                 return false;
             }
             
-            // Store old values for validation
             String oldJobCategory = this.jobCategory;
             String oldEducation = this.education;
             int oldPayScale = this.payScale;
             
-            // Temporarily set new values for validation
             this.jobCategory = newJobCategory;
             this.education = newEducation;
             this.payScale = newPayScale;
             
-            // Validate new education based on job category
             if (!validateEducationForJobCategory()) {
-                // Restore old values if validation fails
                 this.jobCategory = oldJobCategory;
                 this.education = oldEducation;
                 this.payScale = oldPayScale;
                 return false;
             }
             
-            // Validate new pay scale based on job category
             if (!validatePayScaleForJobCategory()) {
-                // Restore old values if validation fails
                 this.jobCategory = oldJobCategory;
                 this.education = oldEducation;
                 this.payScale = oldPayScale;
                 return false;
             }
             
-            // All validations passed - update is successful
             JOptionPane.showMessageDialog(null, 
                 "Employee information updated successfully!\n" +
                 "Employee ID: " + this.empID + "\n" +
@@ -248,7 +220,6 @@ public class Employee implements Serializable {
         }
     }
     
-    // Delete employee information (reset all fields except empID)
     public void deleteEmpInformation() {
         this.employeeName = null;
         this.fatherName = null;
@@ -259,7 +230,6 @@ public class Employee implements Serializable {
         this.NIC = null;
     }
     
-    // Check if employee record is deleted (all fields are empty/null)
     public boolean isDeleted() {
         return this.employeeName == null && 
                this.fatherName == null && 
@@ -270,7 +240,6 @@ public class Employee implements Serializable {
                this.NIC == null;
     }
     
-    // Method to set date of birth from user input
     private boolean setDateOfBirthFromInput() {
         while (true) {
             String dobStr = JOptionPane.showInputDialog(
@@ -278,7 +247,6 @@ public class Employee implements Serializable {
                 "Example: 15-05-1990");
             
             if (dobStr == null) {
-                // User cancelled
                 return false;
             }
             
@@ -288,11 +256,9 @@ public class Employee implements Serializable {
             }
             
             try {
-                // Parse the date string
-                dateFormat.setLenient(false); // Strict parsing
+                dateFormat.setLenient(false);
                 this.dateOfBirth = dateFormat.parse(dobStr.trim());
                 
-                // Validate that date is not in future
                 if (this.dateOfBirth.after(new Date())) {
                     JOptionPane.showMessageDialog(null, "Date of Birth cannot be in the future!", "Error", JOptionPane.ERROR_MESSAGE);
                     continue;
@@ -311,7 +277,6 @@ public class Employee implements Serializable {
         }
     }
     
-    // Calculate age from date of birth
     public int calculateAge() {
         if (this.dateOfBirth == null) {
             return 0;
@@ -323,7 +288,6 @@ public class Employee implements Serializable {
         
         int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
         
-        // Adjust age if birthday hasn't occurred this year yet
         if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
             age--;
         }
@@ -331,7 +295,6 @@ public class Employee implements Serializable {
         return age;
     }
     
-    // Validate education based on job category
     private boolean validateEducationForJobCategory() {
         int educationIndex = getEducationIndex(this.education);
         
@@ -384,7 +347,6 @@ public class Employee implements Serializable {
         return true;
     }
     
-    // Validate pay scale based on job category
     private boolean validatePayScaleForJobCategory() {
         switch (this.jobCategory) {
             case "Teacher":
@@ -435,7 +397,6 @@ public class Employee implements Serializable {
         return true;
     }
     
-    // Helper method to get education level as index for comparison
     private int getEducationIndex(String education) {
         for (int i = 0; i < VALID_EDUCATION_LEVELS.length; i++) {
             if (VALID_EDUCATION_LEVELS[i].equals(education)) {
@@ -445,7 +406,6 @@ public class Employee implements Serializable {
         return -1;
     }
     
-    // Improved toString with formatted date and age
     @Override
     public String toString() {
         if (isDeleted()) {
@@ -468,7 +428,6 @@ public class Employee implements Serializable {
                "\nNIC: " + NIC;
     }
     
-    // Getters and setters
     public String getEmployeeName() { return employeeName; }
     public void setEmployeeName(String employeeName) { this.employeeName = employeeName; }
     public String getFatherName() { return fatherName; }
@@ -485,12 +444,10 @@ public class Employee implements Serializable {
     public String getNIC() { return NIC; }
     public void setNIC(String NIC) { this.NIC = NIC; }
     
-    // Static method to reset EmpID counter (useful for testing)
     public static void resetEmpIDCounter() {
         nextEmpID = 9000;
     }
     
-    // Static method to set EmpID counter (for loading from file)
     public static void setNextEmpID(int nextID) {
         nextEmpID = nextID;
     }

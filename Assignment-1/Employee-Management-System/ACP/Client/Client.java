@@ -6,9 +6,8 @@ import java.io.*;
 import java.util.Arrays;
 
 public class Client {
-    // Array to hold maximum 50 employees
     private static Employee[] employees = new Employee[50];
-    private static int employeeCount = 0; // Track how many employees we have
+    private static int employeeCount = 0;
     private static final String DATA_FILE = "EmpDB.dat";
     
     public static void main(String[] args) {
@@ -19,13 +18,11 @@ public class Client {
             "Employee System", 
             JOptionPane.INFORMATION_MESSAGE);
         
-        // Load existing data from file when program starts
         loadFromFile();
         
         showMainMenu();
     }
     
-    // Load employee data from file using serialization
     private static void loadFromFile() {
         File file = new File(DATA_FILE);
         
@@ -39,26 +36,22 @@ public class Client {
         }
         
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DATA_FILE))) {
-            // Read the entire array from file
             Employee[] loadedEmployees = (Employee[]) ois.readObject();
             
-            // Copy non-null employees to our array
             employeeCount = 0;
-            int highestEmpID = 8999; // Track the highest EmpID for counter
+            int highestEmpID = 8999;
             
             for (Employee emp : loadedEmployees) {
                 if (emp != null && !emp.isDeleted()) {
                     employees[employeeCount] = emp;
                     employeeCount++;
                     
-                    // Update highest EmpID
                     if (emp.getEmpID() > highestEmpID) {
                         highestEmpID = emp.getEmpID();
                     }
                 }
             }
             
-            // Set the next EmpID to continue from the highest found
             Employee.setNextEmpID(highestEmpID + 1);
             
             JOptionPane.showMessageDialog(null, 
@@ -92,16 +85,13 @@ public class Client {
         }
     }
     
-    // Save employee data to file using serialization
     private static void saveToFile() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DATA_FILE))) {
-            // Create a temporary array with only the active employees
             Employee[] employeesToSave = new Employee[employeeCount];
             for (int i = 0; i < employeeCount; i++) {
                 employeesToSave[i] = employees[i];
             }
             
-            // Write the array to file
             oos.writeObject(employeesToSave);
             oos.flush();
             
@@ -145,7 +135,6 @@ public class Client {
             );
             
             if (choice == null) {
-                // User closed the dialog
                 exitProgram();
                 break;
             }
@@ -252,7 +241,6 @@ public class Client {
             Employee foundEmployee = null;
             int foundIndex = -1;
             
-            // Find the employee
             for (int i = 0; i < employeeCount; i++) {
                 if (employees[i].getEmpID() == searchID && !employees[i].isDeleted()) {
                     foundEmployee = employees[i];
@@ -262,7 +250,6 @@ public class Client {
             }
             
             if (foundEmployee != null) {
-                // Show current information and perform update
                 boolean success = foundEmployee.updateEmpInformation();
                 if (success) {
                     JOptionPane.showMessageDialog(null, 
@@ -298,7 +285,6 @@ public class Client {
             Employee foundEmployee = null;
             int foundIndex = -1;
             
-            // Find the employee
             for (int i = 0; i < employeeCount; i++) {
                 if (employees[i].getEmpID() == searchID && !employees[i].isDeleted()) {
                     foundEmployee = employees[i];
@@ -308,7 +294,6 @@ public class Client {
             }
             
             if (foundEmployee != null) {
-                // Show confirmation dialog
                 int confirm = JOptionPane.showConfirmDialog(
                     null,
                     "Are you sure you want to delete this employee?\n\n" +
@@ -320,7 +305,6 @@ public class Client {
                 );
                 
                 if (confirm == JOptionPane.YES_OPTION) {
-                    // Perform deletion
                     String deletedName = foundEmployee.getEmployeeName();
                     foundEmployee.deleteEmpInformation();
                     
@@ -493,7 +477,6 @@ public class Client {
     }
     
     private static void addNewEmployee() {
-        // Check if array is full
         if (employeeCount >= 50) {
             JOptionPane.showMessageDialog(null, 
                 "Cannot add new employee!\n" +
@@ -503,14 +486,11 @@ public class Client {
             return;
         }
         
-        // Create new employee object
         Employee newEmployee = new Employee();
         
-        // Set employee information
         boolean success = newEmployee.setEmpInformation();
         
         if (success) {
-            // Add to array
             employees[employeeCount] = newEmployee;
             employeeCount++;
             
@@ -529,7 +509,6 @@ public class Client {
     }
     
     private static void exitProgram() {
-        // Ask user if they want to save before exiting
         int saveChoice = JOptionPane.showConfirmDialog(
             null,
             "Do you want to save all changes to the database before exiting?",
@@ -541,7 +520,7 @@ public class Client {
         if (saveChoice == JOptionPane.YES_OPTION) {
             saveToFile();
         } else if (saveChoice == JOptionPane.CANCEL_OPTION) {
-            return; // Don't exit
+            return;
         }
         
         JOptionPane.showMessageDialog(null, 
