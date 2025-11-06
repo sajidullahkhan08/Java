@@ -5,8 +5,9 @@ public class JustHanging {
 		if (state == "Free") {
 			System.out.println("Hang around!");
 		}
-		else if (state = "University") {
+		else if (state == "University") {
 			System.out.println("Study!");
+		}
 		else {
 			System.out.println("Do the relevant stuff!");
 		}
