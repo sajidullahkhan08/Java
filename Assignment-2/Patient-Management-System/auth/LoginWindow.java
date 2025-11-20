@@ -185,19 +185,25 @@ public class LoginWindow extends JFrame {
     }
     
     public static void main(String[] args) {
-        // Set system look and feel
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeel());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    // Set system look and feel
+    try {
+        // Option 1: Use cross-platform look and feel
+        // UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
         
-        // Initialize database connection
-        DBConnection.getConnection();
+        // Option 2: Use system look and feel (recommended)
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         
-        // Show login window
-        SwingUtilities.invokeLater(() -> {
-            new LoginWindow().setVisible(true);
-        });
+    } catch (Exception e) {
+        System.err.println("Error setting look and feel: " + e.getMessage());
+        // Continue with default look and feel
     }
+    
+    // Initialize database connection
+    DBConnection.getConnection();
+    
+    // Show login window
+    SwingUtilities.invokeLater(() -> {
+        new LoginWindow().setVisible(true);
+    });
+}
 }
