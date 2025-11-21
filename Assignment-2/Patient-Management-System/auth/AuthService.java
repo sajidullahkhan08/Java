@@ -3,6 +3,8 @@ package auth;
 import model.User;
 import database.DBConnection;
 import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class AuthService {
     
@@ -95,9 +97,42 @@ public class AuthService {
     }
     
     private static boolean changePasswordHardcoded(String username, String oldPassword, String newPassword) {
-        // For hardcoded users, we can't actually change the password in code
-        // So we just verify the old password matches
-        return ("admin".equals(username) && "admin123".equals(oldPassword)) ||
-               ("guest".equals(username) && "guest123".equals(oldPassword));
+        // For hardcoded users, we'll simulate password change
+        // In a real system, you'd update the hardcoded values
+        boolean oldPasswordCorrect = ("admin".equals(username) && "admin123".equals(oldPassword)) ||
+                                    ("guest".equals(username) && "guest123".equals(oldPassword));
+        
+        if (oldPasswordCorrect) {
+            System.out.println("Simulated password change for: " + username);
+            return true;
+        }
+        
+        return false;
+    }
+    
+    // New method to get all users (for admin purposes)
+    public static List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users ORDER BY user_type, username";
+        
+        try (Connection conn = DBConnection.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                User user = new User(
+                    rs.getInt("user_id"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("user_type")
+                );
+                users.add(user);
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error getting all users: " + e.getMessage());
+        }
+        
+        return users;
     }
 }

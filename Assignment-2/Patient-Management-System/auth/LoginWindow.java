@@ -65,13 +65,8 @@ public class LoginWindow extends JFrame {
         loginButton = new JButton("Login");
         cancelButton = new JButton("Cancel");
         
-        // Style buttons
-        loginButton.setBackground(new Color(0, 120, 0));
-        loginButton.setForeground(Color.WHITE);
+        // Style buttons - use default system look and feel for consistency
         loginButton.setFocusPainted(false);
-        
-        cancelButton.setBackground(new Color(200, 0, 0));
-        cancelButton.setForeground(Color.WHITE);
         cancelButton.setFocusPainted(false);
         
         buttonPanel.add(loginButton);

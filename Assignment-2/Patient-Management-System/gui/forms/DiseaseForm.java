@@ -62,10 +62,8 @@ public class DiseaseForm extends JDialog {
         saveButton = new JButton("Save");
         cancelButton = new JButton("Cancel");
         
-        saveButton.setBackground(new Color(0, 120, 0));
-        saveButton.setForeground(Color.WHITE);
-        cancelButton.setBackground(new Color(200, 0, 0));
-        cancelButton.setForeground(Color.WHITE);
+        saveButton.setFocusPainted(false);
+        cancelButton.setFocusPainted(false);
         
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
