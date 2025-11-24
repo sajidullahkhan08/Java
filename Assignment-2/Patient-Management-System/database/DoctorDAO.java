@@ -85,8 +85,8 @@ public class DoctorDAO {
         
         return null;
     }
-
-        public static List<Doctor> getDoctorsByName(String name) {
+    
+    public static List<Doctor> getDoctorsByName(String name) {
         List<Doctor> doctors = new ArrayList<>();
         String sql = """
             SELECT d.doctor_id, d.doctor_name, d.disease_id, dis.disease_name 

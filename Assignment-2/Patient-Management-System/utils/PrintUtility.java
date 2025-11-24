@@ -38,10 +38,15 @@ public class PrintUtility implements Printable {
         g2d.scale(0.7, 0.7); // Scale to fit page
         
         // Prevent the component from changing size when printed
-        boolean doubleBuffered = component.isDoubleBuffered();
-        // component.setDoubleBuffered(false);
-        component.printAll(g2d);
-        // component.setDoubleBuffered(doubleBuffered);
+        if (component instanceof JComponent) {
+            JComponent jComponent = (JComponent) component;
+            boolean doubleBuffered = jComponent.isDoubleBuffered();
+            jComponent.setDoubleBuffered(false);
+            component.printAll(g2d);
+            jComponent.setDoubleBuffered(doubleBuffered);
+        } else {
+            component.printAll(g2d);
+        }
         
         return PAGE_EXISTS;
     }

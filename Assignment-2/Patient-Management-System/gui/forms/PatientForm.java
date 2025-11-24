@@ -4,6 +4,7 @@ import model.Patient;
 import model.Doctor;
 import database.PatientDAO;
 import database.DoctorDAO;
+import utils.ValidationUtility;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -29,6 +30,7 @@ public class PatientForm extends JDialog {
         setupEventListeners();
         pack();
         setLocationRelativeTo(parent);
+        setSize(600, 500);
     }
     
     public PatientForm(JFrame parent, Patient patient) {
@@ -41,11 +43,11 @@ public class PatientForm extends JDialog {
         setupEventListeners();
         pack();
         setLocationRelativeTo(parent);
+        setSize(600, 500);
     }
     
     private void initializeUI() {
         setLayout(new BorderLayout(10, 10));
-        setPreferredSize(new Dimension(600, 500));
         
         // Main panel with padding
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
@@ -259,7 +261,7 @@ public class PatientForm extends JDialog {
         // Parse date
         Date dob;
         try {
-            dob = utils.ValidationUtility.parseDate(dobField.getText().trim());
+            dob = ValidationUtility.parseDate(dobField.getText().trim());
         } catch (Exception e) {
             showValidationError("Please enter date in DD-MM-YYYY format (e.g., 15-05-1990).");
             dobField.requestFocus();

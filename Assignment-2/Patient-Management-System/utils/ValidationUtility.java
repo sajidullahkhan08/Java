@@ -42,4 +42,20 @@ public class ValidationUtility {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
         return sdf.format(date);
     }
+    
+    public static int calculateAge(Date dob) {
+        if (dob == null) return 0;
+        
+        java.util.Calendar now = java.util.Calendar.getInstance();
+        java.util.Calendar dobCal = java.util.Calendar.getInstance();
+        dobCal.setTime(dob);
+        
+        int age = now.get(java.util.Calendar.YEAR) - dobCal.get(java.util.Calendar.YEAR);
+        
+        if (now.get(java.util.Calendar.DAY_OF_YEAR) < dobCal.get(java.util.Calendar.DAY_OF_YEAR)) {
+            age--;
+        }
+        
+        return age;
+    }
 }

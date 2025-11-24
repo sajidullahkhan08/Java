@@ -3,8 +3,8 @@ package auth;
 import model.User;
 import database.DBConnection;
 import java.sql.*;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class AuthService {
     

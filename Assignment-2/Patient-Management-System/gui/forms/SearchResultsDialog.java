@@ -1,5 +1,6 @@
 package gui.forms;
 
+import utils.PrintUtility;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -7,10 +8,12 @@ import java.awt.event.ActionEvent;
 
 public class SearchResultsDialog extends JDialog {
     private JTable resultsTable;
-    private JButton closeButton;
+    private JButton closeButton, printButton;
+    private String dialogTitle;
     
     public SearchResultsDialog(JFrame parent, String title, Object[][] data, String[] columnNames) {
         super(parent, title, true);
+        this.dialogTitle = title;
         initializeUI(data, columnNames);
         pack();
         setLocationRelativeTo(parent);
@@ -39,10 +42,15 @@ public class SearchResultsDialog extends JDialog {
         JScrollPane scrollPane = new JScrollPane(resultsTable);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         
-        // Close button
+        // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        printButton = new JButton("Print");
         closeButton = new JButton("Close");
+        
+        printButton.addActionListener(e -> printResults());
         closeButton.addActionListener(e -> dispose());
+        
+        buttonPanel.add(printButton);
         buttonPanel.add(closeButton);
         
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -62,19 +70,32 @@ public class SearchResultsDialog extends JDialog {
         });
     }
     
+    private void printResults() {
+        PrintUtility.printTable(resultsTable, dialogTitle);
+    }
+    
     private void showDetailsDialog(int row) {
-        // This can be enhanced to show detailed patient information
         int modelRow = resultsTable.convertRowIndexToModel(row);
         StringBuilder details = new StringBuilder();
         
         for (int i = 0; i < resultsTable.getColumnCount(); i++) {
             String columnName = resultsTable.getColumnName(i);
             Object value = resultsTable.getModel().getValueAt(modelRow, i);
-            details.append(columnName).append(": ").append(value).append("\n");
+            if (value != null) {
+                details.append(columnName).append(": ").append(value).append("\n");
+            }
         }
         
+        JTextArea textArea = new JTextArea(details.toString());
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(400, 300));
+        
         JOptionPane.showMessageDialog(this, 
-            details.toString(), 
+            scrollPane, 
             "Record Details", 
             JOptionPane.INFORMATION_MESSAGE);
     }

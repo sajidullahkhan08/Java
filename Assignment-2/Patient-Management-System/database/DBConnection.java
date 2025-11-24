@@ -76,8 +76,9 @@ public class DBConnection {
             stmt.execute(createDoctorTable);
             stmt.execute(createPatientTable);
             
-            // Insert default users
+            // Insert default users and diseases
             insertDefaultUsers();
+            insertDefaultDiseases();
             
             System.out.println("Database initialized successfully.");
             
@@ -104,6 +105,37 @@ public class DBConnection {
             
         } catch (SQLException e) {
             System.err.println("Error inserting default users: " + e.getMessage());
+        }
+    }
+    
+    private static void insertDefaultDiseases() {
+        String checkDiseases = "SELECT COUNT(*) FROM Disease";
+        String[] diseaseInserts = {
+            "INSERT OR IGNORE INTO Disease (disease_name, disease_description) VALUES ('Cardiology', 'Heart and blood vessel disorders')",
+            "INSERT OR IGNORE INTO Disease (disease_name, disease_description) VALUES ('Neurology', 'Brain and nervous system disorders')",
+            "INSERT OR IGNORE INTO Disease (disease_name, disease_description) VALUES ('Pediatrics', 'Children''s health and development')",
+            "INSERT OR IGNORE INTO Disease (disease_name, disease_description) VALUES ('Orthopedics', 'Bone and joint disorders')",
+            "INSERT OR IGNORE INTO Disease (disease_name, disease_description) VALUES ('Dermatology', 'Skin conditions and diseases')",
+            "INSERT OR IGNORE INTO Disease (disease_name, disease_description) VALUES ('Gastroenterology', 'Digestive system disorders')",
+            "INSERT OR IGNORE INTO Disease (disease_name, disease_description) VALUES ('Psychiatry', 'Mental health and behavioral disorders')",
+            "INSERT OR IGNORE INTO Disease (disease_name, disease_description) VALUES ('Ophthalmology', 'Eye diseases and vision care')"
+        };
+        
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(checkDiseases)) {
+            
+            if (rs.getInt(1) == 0) {
+                for (String insert : diseaseInserts) {
+                    stmt.execute(insert);
+                }
+                System.out.println("Default diseases created successfully.");
+            } else {
+                System.out.println("Diseases already exist in database.");
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error inserting default diseases: " + e.getMessage());
         }
     }
     

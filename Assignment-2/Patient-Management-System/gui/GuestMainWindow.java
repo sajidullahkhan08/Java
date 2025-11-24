@@ -4,10 +4,9 @@ import model.User;
 import database.PatientDAO;
 import model.Patient;
 import gui.forms.SearchResultsDialog;
-import javax.swing.*;
-
 import auth.AuthService;
-
+import utils.PrintUtility;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
@@ -21,13 +20,10 @@ public class GuestMainWindow extends JFrame {
     }
     
     private void initializeUI() {
-        setTitle("Patient Management System - Administrator: " + currentUser.getUsername());
+        setTitle("Patient Management System - Guest: " + currentUser.getUsername());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 700);
+        setSize(900, 600);
         setLocationRelativeTo(null);
-        
-        // Set application icon (using standard Java icons)
-        // setIconImage(getToolkit().getImage(ClassLoader.getSystemResource("icons/application.png")));
         
         createMenuBar();
         createToolBar();
@@ -211,6 +207,30 @@ public class GuestMainWindow extends JFrame {
         dialog.setVisible(true);
     }
     
+    private void printPatientList() {
+        List<Patient> patients = PatientDAO.getAllPatients();
+        if (patients.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No patients to print.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        String[] columnNames = {"Patient ID", "Name", "Father Name", "Sex", "Age", "Doctor"};
+        Object[][] data = new Object[patients.size()][6];
+        
+        for (int i = 0; i < patients.size(); i++) {
+            Patient p = patients.get(i);
+            data[i][0] = p.getPatientId();
+            data[i][1] = p.getPatientName();
+            data[i][2] = p.getPfName();
+            data[i][3] = p.getSex();
+            data[i][4] = p.getAge();
+            data[i][5] = p.getDoctorName();
+        }
+        
+        JTable table = new JTable(data, columnNames);
+        PrintUtility.printTable(table, "Patient List - Guest Access - " + new java.util.Date());
+    }
+    
     private void showAboutDialog() {
         JTextArea aboutText = new JTextArea();
         aboutText.setText(
@@ -225,6 +245,11 @@ public class GuestMainWindow extends JFrame {
             "• Secure User Authentication\n" +
             "• Role-based Access Control\n" +
             "• Printing and Reporting\n\n" +
+            "GUEST ACCESS:\n" +
+            "• Read-only access to patient records\n" +
+            "• Search patients by name, ID, or age\n" +
+            "• View patient details\n" +
+            "• Print patient lists\n\n" +
             "TECHNOLOGIES:\n" +
             "• Java Swing for GUI\n" +
             "• SQLite Database\n" +
@@ -237,14 +262,13 @@ public class GuestMainWindow extends JFrame {
         aboutText.setBackground(UIManager.getColor("Panel.background"));
         
         JScrollPane scrollPane = new JScrollPane(aboutText);
-        scrollPane.setPreferredSize(new Dimension(400, 300));
+        scrollPane.setPreferredSize(new Dimension(400, 400));
         
         JOptionPane.showMessageDialog(this, scrollPane, "About Patient Management System", 
             JOptionPane.INFORMATION_MESSAGE);
     }
     
-    
-        private void changePassword() {
+    private void changePassword() {
         JPasswordField oldPasswordField = new JPasswordField(20);
         JPasswordField newPasswordField = new JPasswordField(20);
         JPasswordField confirmPasswordField = new JPasswordField(20);
@@ -303,29 +327,5 @@ public class GuestMainWindow extends JFrame {
                     JOptionPane.ERROR_MESSAGE);
             }
         }
-    }
-
-    private void printPatientList() {
-        List<Patient> patients = PatientDAO.getAllPatients();
-        if (patients.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "No patients to print.", "Info", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-        
-        String[] columnNames = {"Patient ID", "Name", "Father Name", "Sex", "Age", "Doctor"};
-        Object[][] data = new Object[patients.size()][6];
-        
-        for (int i = 0; i < patients.size(); i++) {
-            Patient p = patients.get(i);
-            data[i][0] = p.getPatientId();
-            data[i][1] = p.getPatientName();
-            data[i][2] = p.getPfName();
-            data[i][3] = p.getSex();
-            data[i][4] = p.getAge();
-            data[i][5] = p.getDoctorName();
-        }
-        
-        JTable table = new JTable(data, columnNames);
-        utils.PrintUtility.printTable(table, "Patient List - Guest Access - " + new java.util.Date());
     }
 }

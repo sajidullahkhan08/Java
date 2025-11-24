@@ -28,6 +28,7 @@ public class User {
     public String getUserType() { return userType; }
     public void setUserType(String userType) { this.userType = userType; }
     
+    @Override
     public String toString() {
         return "User{" +
                 "userId=" + userId +

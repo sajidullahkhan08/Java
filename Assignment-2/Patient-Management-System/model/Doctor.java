@@ -27,6 +27,7 @@ public class Doctor {
     public String getDiseaseName() { return diseaseName; }
     public void setDiseaseName(String diseaseName) { this.diseaseName = diseaseName; }
     
+    @Override
     public String toString() {
         return doctorName + (diseaseName != null ? " (" + diseaseName + ")" : "");
     }

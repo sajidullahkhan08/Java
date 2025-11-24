@@ -23,6 +23,7 @@ public class Disease {
     public String getDiseaseDescription() { return diseaseDescription; }
     public void setDiseaseDescription(String diseaseDescription) { this.diseaseDescription = diseaseDescription; }
     
+    @Override
     public String toString() {
         return diseaseName;
     }

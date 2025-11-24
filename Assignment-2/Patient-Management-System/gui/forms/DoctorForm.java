@@ -50,7 +50,8 @@ public class DoctorForm extends JDialog {
         cancelButton = new JButton("Cancel");
         
         saveButton.setFocusPainted(false);
-        cancelButton.setFocusPainted(false);
+        cancelButton.setBackground(new Color(200, 0, 0));
+        cancelButton.setForeground(Color.WHITE);
         
         buttonPanel.add(saveButton);
         buttonPanel.add(cancelButton);
