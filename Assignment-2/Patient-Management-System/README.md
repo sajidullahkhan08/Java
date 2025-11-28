@@ -111,7 +111,7 @@ Edit the following file to match your environment:
 ```java
 private static final String URL = "jdbc:mysql://localhost:3306/patient_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
 private static final String USERNAME = "root";
-private static final String PASSWORD = "your_password"; // ← CHANGE THIS
+private static final String PASSWORD = "your_password";
 ```
 
 ### MySQL Driver Location
