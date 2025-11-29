@@ -3,12 +3,14 @@ package gui;
 import gui.forms.*;
 import database.PatientDAO;
 import model.Patient;
+import utils.PasswordManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.print.*;
 import java.util.List;
 
-public class AdminDashboard extends JFrame {
+public class AdminDashboard extends JFrame implements Printable {
     private PatientDAO patientDAO = new PatientDAO();
 
     public AdminDashboard() {
@@ -49,7 +51,7 @@ public class AdminDashboard extends JFrame {
         // Help Menu
         JMenu helpMenu = new JMenu("Help");
         helpMenu.add(createMenuItem("About Us", e -> JOptionPane.showMessageDialog(this, "Patient Management System v1.0\nFor Assignment No.2")));
-        helpMenu.add(createMenuItem("Change Password", e -> JOptionPane.showMessageDialog(this, "Password change feature")));
+        helpMenu.add(createMenuItem("Change Password", e -> changePassword()));
         menuBar.add(helpMenu);
 
         // ToolBar
@@ -57,7 +59,7 @@ public class AdminDashboard extends JFrame {
         toolBar.add(createToolbarButton("Add Patient", e -> new AddPatientForm().setVisible(true)));
         toolBar.add(createToolbarButton("Search Patient", e -> searchPatientByName()));
         toolBar.add(createToolbarButton("Add Doctor", e -> new AddDoctorForm().setVisible(true)));
-        toolBar.add(createToolbarButton("Print", e -> JOptionPane.showMessageDialog(this, "Print feature")));
+        toolBar.add(createToolbarButton("Print", e -> printDashboard()));
         add(toolBar, BorderLayout.NORTH);
 
         add(new JLabel("Welcome, Administrator!", JLabel.CENTER), BorderLayout.CENTER);
@@ -148,5 +150,56 @@ public class AdminDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, "Search error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+    }
+
+    private void printDashboard() {
+        PrinterJob job = PrinterJob.getPrinterJob();
+        job.setPrintable(this);
+        if (job.printDialog()) {
+            try {
+                job.print();
+                JOptionPane.showMessageDialog(this, "Print job sent successfully.");
+            } catch (PrinterException ex) {
+                JOptionPane.showMessageDialog(this, "Print error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void changePassword() {
+        JPasswordField oldPass = new JPasswordField();
+        JPasswordField newPass = new JPasswordField();
+        JPasswordField confirmPass = new JPasswordField();
+        Object[] message = {
+            "Current Password:", oldPass,
+            "New Password:", newPass,
+            "Confirm New Password:", confirmPass
+        };
+        int option = JOptionPane.showConfirmDialog(this, message, "Change Password", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            String old = new String(oldPass.getPassword());
+            String newP = new String(newPass.getPassword());
+            String confirm = new String(confirmPass.getPassword());
+            if (!PasswordManager.validatePassword("admin", old)) {
+                JOptionPane.showMessageDialog(this, "Incorrect current password.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (!newP.equals(confirm)) {
+                JOptionPane.showMessageDialog(this, "New passwords do not match.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (newP.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "New password cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                PasswordManager.setPassword("admin", newP);
+                JOptionPane.showMessageDialog(this, "Password changed successfully!");
+            }
+        }
+    }
+
+    @Override
+    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+        if (pageIndex > 0) {
+            return NO_SUCH_PAGE;
+        }
+        Graphics2D g2d = (Graphics2D) graphics;
+        g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+        this.printAll(g2d);
+        return PAGE_EXISTS;
     }
 }

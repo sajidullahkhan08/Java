@@ -46,7 +46,8 @@ PatientManagementSystem/
 │   │       └── SearchResultsWindow.java   # Displays JTable results
 │   │
 │   └── utils/
-│       └── TableModelHelper.java          # Builds JTable from lists
+│       ├── TableModelHelper.java          # Builds JTable from lists
+│       └── PasswordManager.java           # Manages persistent user passwords
 │
 ├── lib/                                   # (Optional) MySQL connector JAR
 │   └── mysql-connector-j-9.5.0.jar
@@ -139,13 +140,13 @@ java -cp "bin;C:\mysql-connector-j-9.5.0\mysql-connector-j-9.5.0\mysql-connector
 
 ## 🔐 Login System
 
-- **Login Screen**: `LoginWindow.java`
+- **Login Screen**: `LoginWindow.java` (improved UI with GridBagLayout for better spacing)
 - **User Types**: `Administrator` or `Guest`
-- **Hardcoded Credentials** (for simplicity):
-  - **Admin**: `Username = admin`, `Password = admin`
-  - **Guest**: `Username = guest`, `Password = guest`
+- **Persistent Credentials** (stored in `passwords.properties`):
+  - **Admin**: `Username = admin`, `Password = admin` (default, changeable)
+  - **Guest**: `Username = guest`, `Password = guest` (default, changeable)
 
-> 🔒 In a real system, you’d add a `Users` table with hashed passwords.
+> 🔒 Passwords are managed by `PasswordManager.java` and persist across sessions. Change password feature available in both dashboards.
 
 Upon successful login:
 - **Admin** → `AdminDashboard.java`
@@ -166,7 +167,7 @@ Upon successful login:
 - Add New Patient
 - Search Patient Record
 - Add New Doctor
-- Print *(placeholder)*
+- Print (prints dashboard window)
 
 > 🔁 **Update Patient**: Opens `UpdatePatientForm` with only **Disease History** and **Prescription** editable.  
 > 🗑️ **Delete Patient**: Prompts for ID → confirms deletion → removes from DB.
@@ -179,12 +180,12 @@ Upon successful login:
 | Menu | Items |
 |------|-------|
 | **Search Record** | - Search by Name<br>- Search by ID<br>- Search by Age |
-| **Print** | - Print Records *(placeholder)* |
+| **Print** | - Print Records (prints dashboard window) |
 | **Help** | - About Us<br>- Change Password |
 
 ### Tool Bar
 - Search Record
-- Print
+- Print (prints dashboard window)
 
 > 🔍 All search results are displayed in a **`JTable`** via `SearchResultsWindow`.
 
@@ -250,6 +251,11 @@ All DAOs use:
 - Handles null-safe date conversion
 - Used by **all search result windows**
 
+### `PasswordManager.java`
+- Manages user passwords persistently in `passwords.properties`
+- Provides methods for validation, retrieval, and updating passwords
+- Ensures passwords persist across application restarts
+
 ---
 
 ## 🧪 How to Run the Application
@@ -311,7 +317,7 @@ java -cp "bin:your_path/mysql-connector-j-9.5.0.jar" Main
 | Admin: Search by Name/ID/Age → JTable | ✅ | `SearchResultsWindow.java`, `TableModelHelper.java` |
 | Admin: Other search options (placeholder) | ⚠️ | Not fully implemented (can be extended) |
 | Guest: Search by Name/ID/Age | ✅ | `GuestDashboard.java` |
-| Guest: Print & Help | ✅ (placeholders) | `GuestDashboard.java` |
+| Guest: Print & Help | ✅ | `GuestDashboard.java` |
 | Toolbars with icons | ✅ (buttons labeled as icons) | `AdminDashboard.java`, `GuestDashboard.java` |
 | No Null Layout | ✅ | All GUI files |
 | MySQL integration | ✅ | `database` package |
@@ -343,11 +349,13 @@ You can easily add:
 ## 🎯 Final Notes
 
 This project demonstrates:
-- Core Java Swing GUI development
+- Core Java Swing GUI development (improved UI layouts)
 - JDBC + MySQL integration
 - Layered architecture (Model → DAO → GUI)
 - Real-world CRUD operations
 - User role-based access control
+- Persistent password management
+- Print functionality for dashboards
 
 It is **fully functional**, **well-commented**, and **aligned with beginner skill level** while meeting all assignment requirements.
 
