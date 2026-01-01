@@ -1,6 +1,9 @@
 package database;
 
-import java.sql.Connection;import java.sql.DriverManager;import java.sql.SQLException;import java.sql.Statement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class DatabaseConnection{
 
@@ -76,7 +79,7 @@ stmt.executeUpdate(
 }catch(SQLException e){
 throw e;
 }finally{
-// manual close (yeah could be cleaner)
+
 try{ if(stmt!=null) stmt.close(); }catch(Exception ex){}
 try{ if(conn!=null) conn.close(); }catch(Exception ex){}
 }
