@@ -5,7 +5,6 @@ import common.*;
 import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
-import java.util.List;
 
 public class Client {
     private static final String SERVER_IP = "localhost";
@@ -63,7 +62,7 @@ public class Client {
             switch (response.getType()) {
                 case "login":
                     if (response.isSuccess()) {
-                        currentUser = (User) response.getData();
+                        currentUser = response.getUser();
                         loginWindow.dispose();
                         mainWindow = new MainWindow(this, currentUser);
                         mainWindow.setVisible(true);
@@ -75,32 +74,50 @@ public class Client {
                     JOptionPane.showMessageDialog(loginWindow, response.getMessage());
                     break;
                 case "getFriends":
-                    mainWindow.updateFriends((List<User>) response.getData());
+                    if (mainWindow != null) {
+                        mainWindow.updateFriends(response.getFriends());
+                    }
                     break;
                 case "getFriendRequests":
-                    mainWindow.updateFriendRequests((List<User>) response.getData());
+                    if (mainWindow != null) {
+                        mainWindow.updateFriendRequests(response.getFriendRequests());
+                    }
                     break;
                 case "newMessage":
-                    mainWindow.receiveMessage((Message) response.getData());
+                    if (mainWindow != null && response.getMessages() != null && response.getMessages().length > 0) {
+                        mainWindow.receiveMessage(response.getMessages()[0]);
+                    }
                     break;
                 case "getMessages":
-                    mainWindow.displayMessages((List<Message>) response.getData());
+                    if (mainWindow != null) {
+                        mainWindow.displayMessages(response.getMessages());
+                    }
                     break;
                 case "statusUpdate":
-                    Object[] data = (Object[]) response.getData();
-                    mainWindow.updateFriendStatus((Integer) data[0], (String) data[1]);
+                    // Simplified status update
+                    if (mainWindow != null) {
+                        mainWindow.loadFriends(); // Refresh friends list
+                    }
                     break;
                 case "sendFriendRequest":
-                    JOptionPane.showMessageDialog(mainWindow, response.getMessage());
+                    if (mainWindow != null) {
+                        JOptionPane.showMessageDialog(mainWindow, response.getMessage());
+                    }
                     break;
                 case "updateProfile":
-                    JOptionPane.showMessageDialog(mainWindow, response.getMessage());
+                    if (mainWindow != null) {
+                        JOptionPane.showMessageDialog(mainWindow, response.getMessage());
+                    }
                     break;
                 case "newFriendRequest":
-                    mainWindow.loadFriendRequests();
+                    if (mainWindow != null) {
+                        mainWindow.loadFriendRequests();
+                    }
                     break;
                 case "refreshFriends":
-                    mainWindow.loadFriends();
+                    if (mainWindow != null) {
+                        mainWindow.loadFriends();
+                    }
                     break;
             }
         });

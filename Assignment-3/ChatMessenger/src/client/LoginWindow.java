@@ -58,7 +58,11 @@ public class LoginWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
-                client.sendRequest(new Request("login", new String[]{username, password}));
+                Request request = new Request();
+                request.setType("login");
+                request.setUsername(username);
+                request.setPassword(password);
+                client.sendRequest(request);
             }
         });
         buttonPanel.add(loginButton);
@@ -71,7 +75,11 @@ public class LoginWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
-                client.sendRequest(new Request("signup", new String[]{username, password}));
+                Request request = new Request();
+                request.setType("signup");
+                request.setUsername(username);
+                request.setPassword(password);
+                client.sendRequest(request);
             }
         });
         buttonPanel.add(signupButton);

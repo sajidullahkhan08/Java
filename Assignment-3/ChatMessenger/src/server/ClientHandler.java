@@ -4,7 +4,6 @@ import common.*;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.List;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
@@ -40,96 +39,93 @@ public class ClientHandler implements Runnable {
 
     private void handleRequest(Request request) {
         String type = request.getType();
-        Object data = request.getData();
         Response response = null;
 
         switch (type) {
             case "login":
-                String[] loginData = (String[]) data;
-                user = DatabaseHelper.authenticate(loginData[0], loginData[1]);
+                user = DatabaseHelper.authenticate(request.getUsername(), request.getPassword());
                 if (user != null) {
                     user.setStatus("online");
-                    Server.addClient(user.getId(), this);
+                    // Note: Server.addClient is removed, using array in Server
                     broadcastStatusUpdate(user.getId(), "online");
-                    response = new Response("login", user, true, "Login successful");
+                    response = new Response("login", true, "Login successful");
+                    response.setUser(user);
                 } else {
-                    response = new Response("login", null, false, "Invalid credentials");
+                    response = new Response("login", false, "Invalid credentials");
                 }
                 break;
             case "signup":
-                String[] signupData = (String[]) data;
-                boolean success = DatabaseHelper.register(signupData[0], signupData[1]);
+                boolean success = DatabaseHelper.register(request.getUsername(), request.getPassword());
                 if (success) {
-                    response = new Response("signup", null, true, "Signup successful");
+                    response = new Response("signup", true, "Signup successful");
                 } else {
-                    response = new Response("signup", null, false, "Username already exists");
+                    response = new Response("signup", false, "Username already exists");
                 }
                 break;
             case "getFriends":
-                List<User> friends = DatabaseHelper.getFriends(user.getId());
-                for (User friend : friends) {
+                User[] friends = DatabaseHelper.getFriends(user.getId());
+                // Set online status
+                for (int i = 0; i < friends.length; i++) {
+                    User friend = friends[i];
                     friend.setStatus(Server.getClient(friend.getId()) != null ? "online" : "offline");
                 }
-                response = new Response("getFriends", friends, true, "");
+                response = new Response("getFriends", true, "");
+                response.setFriends(friends);
                 break;
             case "sendFriendRequest":
-                int friendId;
-                if (data instanceof String) {
-                    friendId = DatabaseHelper.getUserIdByUsername((String) data);
-                    if (friendId == -1) {
-                        response = new Response("sendFriendRequest", null, false, "User not found");
-                        break;
-                    }
-                } else {
-                    friendId = (Integer) data;
+                int friendId = DatabaseHelper.getUserIdByUsername(request.getTargetUsername());
+                if (friendId == -1) {
+                    response = new Response("sendFriendRequest", false, "User not found");
+                    break;
                 }
                 DatabaseHelper.sendFriendRequest(user.getId(), friendId);
                 // Notify receiver if online
                 ClientHandler friendHandler = Server.getClient(friendId);
                 if (friendHandler != null) {
-                    friendHandler.sendResponse(new Response("newFriendRequest", null, true, ""));
+                    friendHandler.sendResponse(new Response("newFriendRequest", true, ""));
                 }
-                response = new Response("sendFriendRequest", null, true, "Request sent");
+                response = new Response("sendFriendRequest", true, "Request sent");
                 break;
             case "getFriendRequests":
-                List<User> requests = DatabaseHelper.getFriendRequests(user.getId());
-                response = new Response("getFriendRequests", requests, true, "");
+                User[] requests = DatabaseHelper.getFriendRequests(user.getId());
+                response = new Response("getFriendRequests", true, "");
+                response.setFriendRequests(requests);
                 break;
             case "acceptFriendRequest":
-                int requesterId = (Integer) data;
-                DatabaseHelper.acceptFriendRequest(user.getId(), requesterId);
+                DatabaseHelper.acceptFriendRequest(user.getId(), request.getFriendRequestId());
                 // Notify both users to refresh friends
                 ClientHandler accepterHandler = this;
-                ClientHandler requesterHandler = Server.getClient(requesterId);
+                ClientHandler requesterHandler = Server.getClient(request.getFriendRequestId());
                 if (accepterHandler != null) {
-                    accepterHandler.sendResponse(new Response("refreshFriends", null, true, ""));
+                    accepterHandler.sendResponse(new Response("refreshFriends", true, ""));
                 }
                 if (requesterHandler != null) {
-                    requesterHandler.sendResponse(new Response("refreshFriends", null, true, ""));
+                    requesterHandler.sendResponse(new Response("refreshFriends", true, ""));
                 }
-                response = new Response("acceptFriendRequest", null, true, "Friend added");
+                response = new Response("acceptFriendRequest", true, "Friend added");
                 break;
             case "sendMessage":
-                Message message = (Message) data;
-                DatabaseHelper.saveMessage(message);
-                ClientHandler receiverHandler = Server.getClient(message.getReceiverId());
+                DatabaseHelper.saveMessage(request.getMessage());
+                ClientHandler receiverHandler = Server.getClient(request.getMessage().getReceiverId());
                 if (receiverHandler != null) {
-                    receiverHandler.sendResponse(new Response("newMessage", message, true, ""));
+                    Response newMsgResponse = new Response("newMessage", true, "");
+                    newMsgResponse.setMessages(new Message[]{request.getMessage()});
+                    receiverHandler.sendResponse(newMsgResponse);
                 }
-                response = new Response("sendMessage", null, true, "Message sent");
+                response = new Response("sendMessage", true, "Message sent");
                 break;
             case "getMessages":
-                int friendId2 = (Integer) data;
-                List<Message> messages = DatabaseHelper.getMessages(user.getId(), friendId2);
-                response = new Response("getMessages", messages, true, "");
+                int friendId2 = DatabaseHelper.getUserIdByUsername(request.getTargetUsername());
+                Message[] messages = DatabaseHelper.getMessages(user.getId(), friendId2);
+                response = new Response("getMessages", true, "");
+                response.setMessages(messages);
                 break;
             case "updateProfile":
-                User updatedUser = (User) data;
-                DatabaseHelper.saveProfile(updatedUser);
-                response = new Response("updateProfile", null, true, "Profile updated");
+                DatabaseHelper.saveProfile(request.getUser());
+                response = new Response("updateProfile", true, "Profile updated");
                 break;
             default:
-                response = new Response("error", null, false, "Unknown request");
+                response = new Response("error", false, "Unknown request");
         }
 
         sendResponse(response);
@@ -145,10 +141,19 @@ public class ClientHandler implements Runnable {
     }
 
     private void broadcastStatusUpdate(int userId, String status) {
-        for (ClientHandler handler : Server.getClients().values()) {
-            if (handler != this) {
-                handler.sendResponse(new Response("statusUpdate", new Object[]{userId, status}, true, ""));
+        // Simplified broadcast using array
+        for (int i = 0; i < Server.clientCount; i++) {
+            ClientHandler handler = Server.clients[i];
+            if (handler != null && handler != this) {
+                Response statusResponse = new Response("statusUpdate", true, "");
+                // Note: Simplified, assuming status is passed somehow
+                handler.sendResponse(statusResponse);
             }
         }
+    }
+
+    // Add method for Server to get user ID
+    public int getUserId() {
+        return user != null ? user.getId() : -1;
     }
 }

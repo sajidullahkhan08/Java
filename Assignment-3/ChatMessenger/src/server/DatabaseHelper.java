@@ -4,8 +4,6 @@ import common.User;
 import common.Message;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -93,21 +91,29 @@ public class DatabaseHelper {
         }
     }
 
-    public static List<User> getFriends(int userId) {
-        List<User> friends = new ArrayList<>();
+    // Return array instead of List
+    public static User[] getFriends(int userId) {
+        User[] tempFriends = new User[100]; // Fixed size array
+        int count = 0;
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT u.id, u.username FROM users u JOIN friends f ON (f.friend_id = u.id OR f.user_id = u.id) WHERE (f.user_id = ? OR f.friend_id = ?) AND f.status = 'accepted' AND u.id != ?");
             stmt.setInt(1, userId);
             stmt.setInt(2, userId);
             stmt.setInt(3, userId);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
+            while (rs.next() && count < tempFriends.length) {
                 User friend = new User(rs.getInt("id"), rs.getString("username"));
                 loadProfile(friend);
-                friends.add(friend);
+                tempFriends[count] = friend;
+                count++;
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+        // Trim to actual size
+        User[] friends = new User[count];
+        for (int i = 0; i < count; i++) {
+            friends[i] = tempFriends[i];
         }
         return friends;
     }
@@ -123,18 +129,26 @@ public class DatabaseHelper {
         }
     }
 
-    public static List<User> getFriendRequests(int userId) {
-        List<User> requests = new ArrayList<>();
+    // Return array instead of List
+    public static User[] getFriendRequests(int userId) {
+        User[] tempRequests = new User[50]; // Fixed size
+        int count = 0;
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT u.id, u.username FROM users u JOIN friends f ON f.user_id = u.id WHERE f.friend_id = ? AND f.status = 'pending'");
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
+            while (rs.next() && count < tempRequests.length) {
                 User user = new User(rs.getInt("id"), rs.getString("username"));
-                requests.add(user);
+                tempRequests[count] = user;
+                count++;
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+        // Trim array
+        User[] requests = new User[count];
+        for (int i = 0; i < count; i++) {
+            requests[i] = tempRequests[i];
         }
         return requests;
     }
@@ -179,8 +193,10 @@ public class DatabaseHelper {
         return -1;
     }
 
-    public static List<Message> getMessages(int userId, int friendId) {
-        List<Message> messages = new ArrayList<>();
+    // Return array instead of List
+    public static Message[] getMessages(int userId, int friendId) {
+        Message[] tempMessages = new Message[1000]; // Fixed size
+        int count = 0;
         try {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp");
             stmt.setInt(1, userId);
@@ -188,7 +204,7 @@ public class DatabaseHelper {
             stmt.setInt(3, friendId);
             stmt.setInt(4, userId);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
+            while (rs.next() && count < tempMessages.length) {
                 String type = rs.getString("file_type");
                 Message msg;
                 if ("file".equals(type)) {
@@ -197,10 +213,16 @@ public class DatabaseHelper {
                     msg = new Message(rs.getInt("sender_id"), rs.getInt("receiver_id"), rs.getString("message"));
                 }
                 msg.setTimestamp(rs.getTimestamp("timestamp"));
-                messages.add(msg);
+                tempMessages[count] = msg;
+                count++;
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+        // Trim array
+        Message[] messages = new Message[count];
+        for (int i = 0; i < count; i++) {
+            messages[i] = tempMessages[i];
         }
         return messages;
     }

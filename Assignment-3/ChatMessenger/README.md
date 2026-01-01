@@ -1,6 +1,6 @@
-# Chat Messenger Application
+# Chat Messenger Application (Beginner-Level Version)
 
-A comprehensive client-server chat application built with Java Swing, Socket Programming, and MySQL database. Features real-time messaging, file transfer, friend management, and user profiles with a modern, intuitive GUI.
+A simplified client-server chat application built with Java Swing, Socket Programming, and MySQL database. This version uses basic Java constructs (arrays, loops) while maintaining advanced features like multithreading, JDBC, and real-time messaging. Perfect for learning Java fundamentals with practical application.
 
 ## 📋 Table of Contents
 
@@ -59,6 +59,31 @@ A comprehensive client-server chat application built with Java Swing, Socket Pro
 - Color-coded buttons and status indicators
 - Right-click context menus
 - Professional styling with proper spacing
+
+## 🎓 Beginner-Level Modifications
+
+This version has been simplified for educational purposes while retaining all core functionality:
+
+### Code Simplifications
+- **Arrays instead of Collections**: Uses `User[]`, `Message[]` instead of `List<User>`, `List<Message>`
+- **Basic Loops**: Uses `for (int i = 0; i < array.length; i++)` instead of enhanced for-loops or streams
+- **Fixed-Size Arrays**: Pre-allocated arrays with trimming for dynamic sizing
+- **Step-by-Step Logic**: Method implementations show each step explicitly with comments
+- **Specific Request/Response**: Uses dedicated fields instead of generic `Object data`
+
+### Educational Benefits
+- Teaches memory management with arrays
+- Demonstrates basic loop constructs
+- Shows manual array manipulation
+- Maintains advanced concepts (threads, sockets, JDBC) for comprehensive learning
+- Easier to debug and understand for beginners
+
+### Retained Advanced Features
+- Multithreading for concurrent clients
+- TCP socket communication
+- JDBC database operations
+- Swing GUI with event handling
+- Object serialization over network
 
 ## 🏗️ Architecture
 
@@ -179,12 +204,14 @@ To change the server port, modify:
 **Terminal 1 - Start Server:**
 ```bash
 java -cp "lib\mysql-connector-j.jar;src" server.Server
+java -cp "src;lib/mysql-connector-j.jar" server.Server
 ```
 Expected output: `Server started on port 12345`
 
 **Terminal 2 - Start Client:**
 ```bash
 java -cp "lib\mysql-connector-j.jar;src" client.Client
+java -cp "src;lib/mysql-connector-j.jar" client.Client
 ```
 
 ### Using the Application

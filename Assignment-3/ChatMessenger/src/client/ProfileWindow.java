@@ -149,7 +149,10 @@ public class ProfileWindow extends JFrame {
         if (profilePic != null) {
             user.setProfilePic(profilePic);
         }
-        client.sendRequest(new Request("updateProfile", user));
+        Request request = new Request();
+        request.setType("updateProfile");
+        request.setUser(user);
+        client.sendRequest(request);
         JOptionPane.showMessageDialog(this, "Profile updated");
         dispose();
     }

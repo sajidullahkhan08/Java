@@ -11,7 +11,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -143,27 +142,35 @@ public class MainWindow extends JFrame {
     }
 
     public void loadFriends() {
-        client.sendRequest(new Request("getFriends", null));
+        Request request = new Request();
+        request.setType("getFriends");
+        client.sendRequest(request);
     }
 
     public void loadFriendRequests() {
-        client.sendRequest(new Request("getFriendRequests", null));
+        Request request = new Request();
+        request.setType("getFriendRequests");
+        client.sendRequest(request);
     }
 
-    public void updateFriends(List<User> friends) {
+    public void updateFriends(User[] friends) {
         friendsModel.clear();
-        for (User friend : friends) {
-            friendsModel.addElement(friend);
+        for (int i = 0; i < friends.length; i++) {
+            friendsModel.addElement(friends[i]);
         }
     }
 
-    public void updateFriendRequests(List<User> requests) {
+    public void updateFriendRequests(User[] requests) {
         // Show in a dialog
-        if (!requests.isEmpty()) {
-            for (User requester : requests) {
+        if (requests.length > 0) {
+            for (int i = 0; i < requests.length; i++) {
+                User requester = requests[i];
                 int result = JOptionPane.showConfirmDialog(this, requester.getUsername() + " wants to be friends. Accept?", "Friend Request", JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
-                    client.sendRequest(new Request("acceptFriendRequest", requester.getId()));
+                    Request request = new Request();
+                    request.setType("acceptFriendRequest");
+                    request.setFriendRequestId(requester.getId());
+                    client.sendRequest(request);
                 }
             }
         }
@@ -171,7 +178,10 @@ public class MainWindow extends JFrame {
 
     private void showChat(User friend) {
         chatArea.setText("");
-        client.sendRequest(new Request("getMessages", friend.getId()));
+        Request request = new Request();
+        request.setType("getMessages");
+        request.setTargetUserId(friend.getId());
+        client.sendRequest(request);
     }
 
     public void receiveMessage(Message message) {
@@ -205,7 +215,10 @@ public class MainWindow extends JFrame {
     private void sendMessage() {
         if (selectedFriend != null && !messageField.getText().isEmpty()) {
             Message message = new Message(currentUser.getId(), selectedFriend.getId(), messageField.getText());
-            client.sendRequest(new Request("sendMessage", message));
+            Request request = new Request();
+            request.setType("sendMessage");
+            request.setMessage(message);
+            client.sendRequest(request);
             appendMessage(message);
             messageField.setText("");
         }
@@ -223,7 +236,10 @@ public class MainWindow extends JFrame {
                     fis.read(fileData);
                     fis.close();
                     Message message = new Message(currentUser.getId(), selectedFriend.getId(), file.getName(), fileData);
-                    client.sendRequest(new Request("sendMessage", message));
+                    Request request = new Request();
+                    request.setType("sendMessage");
+                    request.setMessage(message);
+                    client.sendRequest(request);
                     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
                     String time = sdf.format(message.getTimestamp());
                     chatArea.append("[" + time + "] You sent file: " + file.getName() + "\n");
@@ -237,7 +253,10 @@ public class MainWindow extends JFrame {
     private void addFriend() {
         String friendUsername = JOptionPane.showInputDialog(this, "Enter friend's username:");
         if (friendUsername != null && !friendUsername.isEmpty()) {
-            client.sendRequest(new Request("sendFriendRequest", friendUsername));
+            Request request = new Request();
+            request.setType("sendFriendRequest");
+            request.setTargetUsername(friendUsername);
+            client.sendRequest(request);
         }
     }
 
@@ -262,10 +281,11 @@ public class MainWindow extends JFrame {
         }
     }
 
-    public void displayMessages(List<Message> messages) {
+    public void displayMessages(Message[] messages) {
         chatArea.setText("");
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        for (Message msg : messages) {
+        for (int i = 0; i < messages.length; i++) {
+            Message msg = messages[i];
             String time = sdf.format(msg.getTimestamp());
             if ("file".equals(msg.getType())) {
                 String sender = msg.getSenderId() == currentUser.getId() ? "You" : selectedFriend.getUsername();

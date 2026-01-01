@@ -42,4 +42,4 @@ CREATE TABLE messages (
     FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-INSERT INTO users (username, password) VALUES ('user1', 'pass1'), ('user2', 'pass2');
+INSERT INTO users (username, password) VALUES ('Sajid', 'password123'), ('Nouman', 'password123');
