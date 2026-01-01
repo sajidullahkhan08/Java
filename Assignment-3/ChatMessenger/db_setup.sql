@@ -1,10 +1,7 @@
--- Database setup for Chat Messenger
-
 CREATE DATABASE IF NOT EXISTS chat_messenger;
 
 USE chat_messenger;
 
--- Users table
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -13,7 +10,6 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Profiles table
 CREATE TABLE profiles (
     user_id INT PRIMARY KEY,
     profile_pic LONGBLOB,
@@ -21,7 +17,6 @@ CREATE TABLE profiles (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Friends table
 CREATE TABLE friends (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
@@ -33,7 +28,6 @@ CREATE TABLE friends (
     UNIQUE KEY unique_friendship (user_id, friend_id)
 );
 
--- Messages table
 CREATE TABLE messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     sender_id INT,
@@ -48,5 +42,4 @@ CREATE TABLE messages (
     FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Insert sample users
 INSERT INTO users (username, password) VALUES ('user1', 'pass1'), ('user2', 'pass2');

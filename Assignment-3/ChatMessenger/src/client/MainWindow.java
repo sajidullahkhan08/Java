@@ -237,12 +237,6 @@ public class MainWindow extends JFrame {
     private void addFriend() {
         String friendUsername = JOptionPane.showInputDialog(this, "Enter friend's username:");
         if (friendUsername != null && !friendUsername.isEmpty()) {
-            // Assume we need to find user id, but for simplicity, send username
-            // In real, perhaps search users
-            // For now, assume id is known, but since no search, maybe send request with username
-            // But server expects id, so need to modify
-            // For demo, assume username is id or something, but better add search
-            // To simplify, let's assume we send username and server finds id
             client.sendRequest(new Request("sendFriendRequest", friendUsername));
         }
     }

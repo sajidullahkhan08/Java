@@ -128,10 +128,10 @@ Ensure the JAR is in your system `CLASSPATH` environment variable.
 #### Option 2: Include in Compile/Run Command
 ```bash
 # Compile (Windows - list all packages)
-javac -cp ".;C:\mysql-connector-j-9.5.0\mysql-connector-j-9.5.0\mysql-connector-j-9.5.0.jar" -d bin src/model/*.java src/database/*.java src/utils/*.java src/gui/*.java src/gui/forms/*.java src/*.java
+javac -cp ".;C:\mysql-connector-j-9.5.0\mysql-connector-j-9.5.0\mysql-connector-j-9.5.0.jar" src/model/*.java src/database/*.java src/utils/*.java src/gui/*.java src/gui/forms/*.java src/*.java
 
 # Run
-java -cp "bin;C:\mysql-connector-j-9.5.0\mysql-connector-j-9.5.0\mysql-connector-j-9.5.0.jar" Main
+java -cp ".;C:\mysql-connector-j-9.5.0\mysql-connector-j-9.5.0\mysql-connector-j-9.5.0.jar" src/Main.java
 ```
 
 > 💡 On **Linux/macOS**, replace `;` with `:` in the `-cp` flag.
