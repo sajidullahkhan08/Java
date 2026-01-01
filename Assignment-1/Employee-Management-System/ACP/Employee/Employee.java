@@ -7,448 +7,240 @@ import java.util.Date;
 import javax.swing.JOptionPane;
 
 public class Employee implements Serializable {
-    // Data members
-    private String employeeName;
-    private String fatherName;
-    private int empID;
-    private String jobCategory;
-    private Date dateOfBirth;
-    private String education;
-    private int payScale;
-    private String NIC;
-    
-    private static int nextEmpID = 9000;
-    
-    private static final String[] VALID_JOB_CATEGORIES = {"Teacher", "Officer", "Staff", "Labour"};
-    private static final String[] VALID_EDUCATION_LEVELS = {"Matric", "FSc", "BS", "MS", "PhD"};
-    
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-    
-    public Employee() {
-        this.empID = nextEmpID++;
+
+    String employeeName,fatherName,jobCategory,education,nic;
+    int empID,payScale;
+    Date dob;
+
+    static int nextEmpID = 9000;
+
+    static final String[] JOBS = {"Teacher","Officer","Staff","Labour"};
+    static final String[] EDU = {"Matric","FSc","BS","MS","PhD"};
+
+    static SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+
+    public Employee(){
+        empID = nextEmpID++;
     }
-    
-    public Employee(int empID) {
-        this.empID = empID;
-        if (empID >= nextEmpID) { // This is to 
-            nextEmpID = empID + 1;
-        }
+
+    public Employee(int id){
+        empID = id;
+        if(id >= nextEmpID)
+            nextEmpID = id + 1;
     }
-    
-    public boolean setEmpInformation() {
-        try {
-            this.employeeName = JOptionPane.showInputDialog("Enter Employee Name:");
-            if (this.employeeName == null || this.employeeName.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Employee Name cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+
+    public boolean setEmpInformation(){
+        try{
+            employeeName = JOptionPane.showInputDialog("Enter Employee Name:");
+            if(employeeName == null || employeeName.trim().length()==0){
+                JOptionPane.showMessageDialog(null,"Employee Name cannot be empty!");
                 return false;
             }
-            
-            this.fatherName = JOptionPane.showInputDialog("Enter Father's Name:");
-            if (this.fatherName == null || this.fatherName.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Father's Name cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
+
+            fatherName = JOptionPane.showInputDialog("Enter Father's Name:");
+            if(fatherName == null || fatherName.trim().isEmpty()){
+                JOptionPane.showMessageDialog(null,"Father Name required!");
                 return false;
             }
-            
-            this.jobCategory = (String) JOptionPane.showInputDialog(
-                null,
-                "Select Job Category:",
-                "Job Category",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                VALID_JOB_CATEGORIES,
-                VALID_JOB_CATEGORIES[0]
-            );
-            
-            if (this.jobCategory == null) {
-                JOptionPane.showMessageDialog(null, "Job Category selection cancelled!", "Error", JOptionPane.ERROR_MESSAGE);
+
+            jobCategory = (String)JOptionPane.showInputDialog(
+                    null,"Select Job Category","Job",
+                    JOptionPane.QUESTION_MESSAGE,null,JOBS,JOBS[0]);
+
+            if(jobCategory == null) return false;
+
+            education = (String)JOptionPane.showInputDialog(
+                    null,"Select Education","Education",
+                    JOptionPane.QUESTION_MESSAGE,null,EDU,EDU[0]);
+
+            if(education == null) return false;
+
+            if(!checkEducation()) return false;
+
+            String ps = JOptionPane.showInputDialog("Enter Pay Scale:");
+            if(ps == null) return false;
+
+            try{
+                payScale = Integer.parseInt(ps);
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null,"Pay scale must be number");
                 return false;
             }
-            
-            this.education = (String) JOptionPane.showInputDialog(
-                null,
-                "Select Education Level:",
-                "Education",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                VALID_EDUCATION_LEVELS,
-                VALID_EDUCATION_LEVELS[0]
-            );
-            
-            if (this.education == null) {
-                JOptionPane.showMessageDialog(null, "Education selection cancelled!", "Error", JOptionPane.ERROR_MESSAGE);
+
+            if(!checkPayScale()) return false;
+
+            if(!setDOB()) return false;
+
+            nic = JOptionPane.showInputDialog("Enter NIC:");
+            if(nic == null || nic.trim().isEmpty()){
+                JOptionPane.showMessageDialog(null,"NIC required");
                 return false;
             }
-            
-            if (!validateEducationForJobCategory()) {
-                return false;
-            }
-            
-            String payScaleStr = JOptionPane.showInputDialog("Enter Pay Scale (1-20):");
-            if (payScaleStr == null) {
-                JOptionPane.showMessageDialog(null, "Pay Scale input cancelled!", "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-            
-            try {
-                this.payScale = Integer.parseInt(payScaleStr);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Pay Scale must be a number!", "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-            
-            if (!validatePayScaleForJobCategory()) {
-                return false;
-            }
-            
-            if (!setDateOfBirthFromInput()) {
-                return false;
-            }
-            
-            this.NIC = JOptionPane.showInputDialog("Enter NIC Number:");
-            if (this.NIC == null || this.NIC.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "NIC cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-            
-            JOptionPane.showMessageDialog(null, 
-                "Employee added successfully!\n" +
-                "Employee ID: " + this.empID + "\n" +
-                "Name: " + this.employeeName +
-                "\nAge: " + calculateAge() + " years",
-                "Success", 
-                JOptionPane.INFORMATION_MESSAGE);
-            
+
+            JOptionPane.showMessageDialog(null,
+                    "Employee Added\nID: "+empID+
+                    "\nName: "+employeeName+
+                    "\nAge: "+calculateAge());
             return true;
-            
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error setting employee information: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null,"Error: "+e.getMessage());
             return false;
         }
     }
-    
-    public boolean updateEmpInformation() {
-        JOptionPane.showMessageDialog(null, 
-            "Current Employee Information:\n" + this.toString(),
-            "Current Information", 
-            JOptionPane.INFORMATION_MESSAGE);
-        
-        try {
-            String newJobCategory = (String) JOptionPane.showInputDialog(
-                null,
-                "Select New Job Category:\nCurrent: " + this.jobCategory,
-                "Update Job Category",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                VALID_JOB_CATEGORIES,
-                this.jobCategory
-            );
-            
-            if (newJobCategory == null) {
-                JOptionPane.showMessageDialog(null, "Update cancelled!", "Info", JOptionPane.INFORMATION_MESSAGE);
+
+    public boolean updateEmpInformation(){
+
+        JOptionPane.showMessageDialog(null,"Current Info:\n"+toString());
+
+        try{
+            String newJob = (String)JOptionPane.showInputDialog(
+                    null,"New Job","Update",
+                    JOptionPane.QUESTION_MESSAGE,null,JOBS,jobCategory);
+
+            if(newJob == null) return false;
+
+            String newEdu = (String)JOptionPane.showInputDialog(
+                    null,"New Education","Update",
+                    JOptionPane.QUESTION_MESSAGE,null,EDU,education);
+
+            if(newEdu == null) return false;
+
+            String newPayStr = JOptionPane.showInputDialog("New Pay Scale:");
+            if(newPayStr == null) return false;
+
+            int newPay;
+            try{
+                newPay = Integer.parseInt(newPayStr);
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null,"Invalid pay scale");
                 return false;
             }
-            
-            String newEducation = (String) JOptionPane.showInputDialog(
-                null,
-                "Select New Education Level:\nCurrent: " + this.education,
-                "Update Education",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                VALID_EDUCATION_LEVELS,
-                this.education
-            );
-            
-            if (newEducation == null) {
-                JOptionPane.showMessageDialog(null, "Update cancelled!", "Info", JOptionPane.INFORMATION_MESSAGE);
+
+            // backup
+            String oldJob = jobCategory;
+            String oldEdu = education;
+            int oldPay = payScale;
+
+            jobCategory = newJob;
+            education = newEdu;
+            payScale = newPay;
+
+            if(!checkEducation() || !checkPayScale()){
+                jobCategory = oldJob;
+                education = oldEdu;
+                payScale = oldPay;
                 return false;
             }
-            
-            String payScaleStr = JOptionPane.showInputDialog(
-                "Enter New Pay Scale (1-20):\nCurrent: " + this.payScale);
-            
-            if (payScaleStr == null) {
-                JOptionPane.showMessageDialog(null, "Update cancelled!", "Info", JOptionPane.INFORMATION_MESSAGE);
-                return false;
-            }
-            
-            int newPayScale;
-            try {
-                newPayScale = Integer.parseInt(payScaleStr);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Pay Scale must be a number!", "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-            
-            String oldJobCategory = this.jobCategory;
-            String oldEducation = this.education;
-            int oldPayScale = this.payScale;
-            
-            this.jobCategory = newJobCategory;
-            this.education = newEducation;
-            this.payScale = newPayScale;
-            
-            if (!validateEducationForJobCategory()) {
-                this.jobCategory = oldJobCategory;
-                this.education = oldEducation;
-                this.payScale = oldPayScale;
-                return false;
-            }
-            
-            if (!validatePayScaleForJobCategory()) {
-                this.jobCategory = oldJobCategory;
-                this.education = oldEducation;
-                this.payScale = oldPayScale;
-                return false;
-            }
-            
-            JOptionPane.showMessageDialog(null, 
-                "Employee information updated successfully!\n" +
-                "Employee ID: " + this.empID + "\n" +
-                "Name: " + this.employeeName +
-                "\n\nUpdated Fields:" +
-                "\nJob Category: " + oldJobCategory + " → " + this.jobCategory +
-                "\nEducation: " + oldEducation + " → " + this.education +
-                "\nPay Scale: " + oldPayScale + " → " + this.payScale,
-                "Update Success", 
-                JOptionPane.INFORMATION_MESSAGE);
-            
+
+            JOptionPane.showMessageDialog(null,"Employee Updated Successfully");
             return true;
-            
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error updating employee information: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null,"Update failed");
             return false;
         }
     }
-    
-    public void deleteEmpInformation() {
-        this.employeeName = null;
-        this.fatherName = null;
-        this.jobCategory = null;
-        this.dateOfBirth = null;
-        this.education = null;
-        this.payScale = 0;
-        this.NIC = null;
+
+    public void deleteEmpInformation(){
+        employeeName = null;
+        fatherName = null;
+        jobCategory = null;
+        education = null;
+        dob = null;
+        payScale = 0;
+        nic = null;
     }
-    
-    public boolean isDeleted() {
-        return this.employeeName == null && 
-               this.fatherName == null && 
-               this.jobCategory == null &&
-               this.dateOfBirth == null &&
-               this.education == null &&
-               this.payScale == 0 &&
-               this.NIC == null;
+
+    public boolean isDeleted(){
+        return employeeName == null && fatherName == null &&
+               jobCategory == null && education == null &&
+               dob == null && payScale == 0 && nic == null;
     }
-    
-    private boolean setDateOfBirthFromInput() {
-        while (true) {
-            String dobStr = JOptionPane.showInputDialog(
-                "Enter Date of Birth (DD-MM-YYYY):\n" +
-                "Example: 15-05-1990");
-            
-            if (dobStr == null) {
-                return false;
-            }
-            
-            if (dobStr.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Date of Birth cannot be empty!", "Error", JOptionPane.ERROR_MESSAGE);
-                continue;
-            }
-            
-            try {
-                dateFormat.setLenient(false);
-                this.dateOfBirth = dateFormat.parse(dobStr.trim());
-                
-                if (this.dateOfBirth.after(new Date())) {
-                    JOptionPane.showMessageDialog(null, "Date of Birth cannot be in the future!", "Error", JOptionPane.ERROR_MESSAGE);
-                    continue;
-                }
-                
-                return true;
-                
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, 
-                    "Invalid date format!\n" +
-                    "Please use DD-MM-YYYY format.\n" +
-                    "Example: 15-05-1990", 
-                    "Error", 
-                    JOptionPane.ERROR_MESSAGE);
+
+    private boolean setDOB(){
+        while(true){
+            String in = JOptionPane.showInputDialog("Enter DOB (DD-MM-YYYY)");
+            if(in == null) return false;
+            try{
+                df.setLenient(false);
+                dob = df.parse(in.trim());
+                if(dob.after(new Date())){
+                    JOptionPane.showMessageDialog(null,"DOB cannot be future");
+                }else return true;
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null,"Invalid date format");
             }
         }
     }
-    
-    public int calculateAge() {
-        if (this.dateOfBirth == null) {
-            return 0;
-        }
-        
-        Calendar dob = Calendar.getInstance();
-        dob.setTime(this.dateOfBirth);
-        Calendar today = Calendar.getInstance();
-        
-        int age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR);
-        
-        if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
-            age--;
-        }
-        
+
+    public int calculateAge(){
+        if(dob == null) return 0;
+        Calendar b = Calendar.getInstance();
+        b.setTime(dob);
+        Calendar now = Calendar.getInstance();
+        int age = now.get(Calendar.YEAR) - b.get(Calendar.YEAR);
+        if(now.get(Calendar.DAY_OF_YEAR) < b.get(Calendar.DAY_OF_YEAR)) age--;
         return age;
     }
-    
-    private boolean validateEducationForJobCategory() {
-        int educationIndex = getEducationIndex(this.education);
-        
-        switch (this.jobCategory) {
-            case "Teacher":
-                if (educationIndex < getEducationIndex("MS")) {
-                    JOptionPane.showMessageDialog(null, 
-                        "Teacher must have at least MS education!\n" +
-                        "Current education: " + this.education,
-                        "Validation Error", 
-                        JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                break;
-                
-            case "Officer":
-                if (educationIndex < getEducationIndex("BS")) {
-                    JOptionPane.showMessageDialog(null, 
-                        "Officer must have at least BS education!\n" +
-                        "Current education: " + this.education,
-                        "Validation Error", 
-                        JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                break;
-                
-            case "Staff":
-                if (educationIndex < getEducationIndex("FSc")) {
-                    JOptionPane.showMessageDialog(null, 
-                        "Staff must have at least FSc education!\n" +
-                        "Current education: " + this.education,
-                        "Validation Error", 
-                        JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                break;
-                
-            case "Labour":
-                if (educationIndex < getEducationIndex("Matric")) {
-                    JOptionPane.showMessageDialog(null, 
-                        "Labour must have at least Matric education!\n" +
-                        "Current education: " + this.education,
-                        "Validation Error", 
-                        JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                break;
+
+    private boolean checkEducation(){
+        int idx = eduIndex(education);
+
+        if(jobCategory.equals("Teacher") && idx < eduIndex("MS")){
+            JOptionPane.showMessageDialog(null,"Teacher needs MS or above");
+            return false;
         }
-        
+        if(jobCategory.equals("Officer") && idx < eduIndex("BS")){
+            JOptionPane.showMessageDialog(null,"Officer needs BS or above");
+            return false;
+        }
+        if(jobCategory.equals("Staff") && idx < eduIndex("FSc")){
+            JOptionPane.showMessageDialog(null,"Staff needs FSc or above");
+            return false;
+        }
+        if(jobCategory.equals("Labour") && idx < eduIndex("Matric")){
+            JOptionPane.showMessageDialog(null,"Labour needs Matric");
+            return false;
+        }
         return true;
     }
-    
-    private boolean validatePayScaleForJobCategory() {
-        switch (this.jobCategory) {
-            case "Teacher":
-                if (this.payScale < 18) {
-                    JOptionPane.showMessageDialog(null, 
-                        "Teacher pay scale cannot be less than 18!\n" +
-                        "Current pay scale: " + this.payScale,
-                        "Validation Error", 
-                        JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                break;
-                
-            case "Officer":
-                if (this.payScale < 17) {
-                    JOptionPane.showMessageDialog(null, 
-                        "Officer pay scale cannot be less than 17!\n" +
-                        "Current pay scale: " + this.payScale,
-                        "Validation Error", 
-                        JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                break;
-                
-            case "Staff":
-                if (this.payScale < 11 || this.payScale > 16) {
-                    JOptionPane.showMessageDialog(null, 
-                        "Staff pay scale must be between 11 and 16!\n" +
-                        "Current pay scale: " + this.payScale,
-                        "Validation Error", 
-                        JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                break;
-                
-            case "Labour":
-                if (this.payScale < 1 || this.payScale > 10) {
-                    JOptionPane.showMessageDialog(null, 
-                        "Labour pay scale must be between 1 and 10!\n" +
-                        "Current pay scale: " + this.payScale,
-                        "Validation Error", 
-                        JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-                break;
-        }
-        
+
+    private boolean checkPayScale(){
+        if(jobCategory.equals("Teacher")) return payScale >= 18;
+        if(jobCategory.equals("Officer")) return payScale >= 17;
+        if(jobCategory.equals("Staff")) return payScale >= 11 && payScale <= 16;
+        if(jobCategory.equals("Labour")) return payScale >= 1 && payScale <= 10;
         return true;
     }
-    
-    private int getEducationIndex(String education) {
-        for (int i = 0; i < VALID_EDUCATION_LEVELS.length; i++) {
-            if (VALID_EDUCATION_LEVELS[i].equals(education)) {
-                return i;
-            }
+
+    private int eduIndex(String e){
+        for(int i=0;i<EDU.length;i++){
+            if(EDU[i].equals(e)) return i;
         }
         return -1;
     }
-    
-    @Override
-    public String toString() {
-        if (isDeleted()) {
-            return "Employee ID: " + empID + " [DELETED]";
-        }
-        
-        String formattedDob = "Not set";
-        if (dateOfBirth != null) {
-            formattedDob = dateFormat.format(dateOfBirth);
-        }
-        
-        return "Employee ID: " + empID + 
-               "\nName: " + employeeName +
-               "\nFather Name: " + fatherName +
-               "\nJob Category: " + jobCategory +
-               "\nDate of Birth: " + formattedDob +
-               "\nAge: " + calculateAge() + " years" +
-               "\nEducation: " + education +
-               "\nPay Scale: " + payScale +
-               "\nNIC: " + NIC;
+
+    public String toString(){
+        if(isDeleted()) return "Employee ID: "+empID+" [DELETED]";
+        String d = (dob==null)?"Not set":df.format(dob);
+        return "ID: "+empID+
+                "\nName: "+employeeName+
+                "\nFather: "+fatherName+
+                "\nJob: "+jobCategory+
+                "\nDOB: "+d+
+                "\nAge: "+calculateAge()+
+                "\nEducation: "+education+
+                "\nPayScale: "+payScale+
+                "\nNIC: "+nic;
     }
-    
-    public String getEmployeeName() { return employeeName; }
-    public void setEmployeeName(String employeeName) { this.employeeName = employeeName; }
-    public String getFatherName() { return fatherName; }
-    public void setFatherName(String fatherName) { this.fatherName = fatherName; }
-    public int getEmpID() { return empID; }
-    public String getJobCategory() { return jobCategory; }
-    public void setJobCategory(String jobCategory) { this.jobCategory = jobCategory; }
-    public Date getDateOfBirth() { return dateOfBirth; }
-    public void setDateOfBirth(Date dateOfBirth) { this.dateOfBirth = dateOfBirth; }
-    public String getEducation() { return education; }
-    public void setEducation(String education) { this.education = education; }
-    public int getPayScale() { return payScale; }
-    public void setPayScale(int payScale) { this.payScale = payScale; }
-    public String getNIC() { return NIC; }
-    public void setNIC(String NIC) { this.NIC = NIC; }
-    
-    public static void resetEmpIDCounter() {
-        nextEmpID = 9000;
-    }
-    
-    public static void setNextEmpID(int nextID) {
-        nextEmpID = nextID;
-    }
+
+    // getters / setters (kept minimal)
+    public int getEmpID(){return empID;}
+    public String getEmployeeName(){return employeeName;}
+    public void setEmployeeName(String n){employeeName=n;}
+    public String getJobCategory(){return jobCategory;}
+
+    public static void resetEmpIDCounter(){ nextEmpID = 9000; }
+    public static void setNextEmpID(int id){ nextEmpID = id; }
 }
