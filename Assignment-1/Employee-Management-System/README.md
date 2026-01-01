@@ -26,7 +26,32 @@ The **Employee Management System** is a comprehensive Java application designed 
 - **Array-Based Storage**: Manual array management without using Collections framework
 - **Auto-generated IDs**: Unique employee IDs starting from 9000
 
-## 🏗️ System Architecture
+## � Beginner-Level Design
+
+This project is specifically designed for Java beginners while demonstrating real-world application development concepts:
+
+### Educational Focus
+- **Manual Array Management**: Uses fixed-size arrays with manual resizing, teaching memory management
+- **Basic Control Structures**: Employs simple loops and conditionals instead of advanced stream operations
+- **Step-by-Step Logic**: Methods implement logic explicitly with clear, commented steps
+- **Fundamental OOP**: Demonstrates encapsulation, static members, and basic inheritance concepts
+- **File I/O Basics**: Introduces serialization without complex frameworks
+
+### Learning Objectives
+- Understand array manipulation and bounds checking
+- Practice input validation and error handling
+- Learn basic file persistence techniques
+- Experience GUI development with Swing dialogs
+- Apply business rules through conditional logic
+
+### Retained Practical Features
+- ✅ Data persistence with serialization
+- ✅ Input validation and business rules
+- ✅ Graphical user interface
+- ✅ CRUD operations implementation
+- ✅ Auto-generated unique identifiers
+
+## �🏗️ System Architecture
 
 ### High-Level Design
 ```
