@@ -4,10 +4,8 @@ import java.io.Serializable;
 
 public class User implements Serializable {
     private int id;
-    private String username;
-    private String status; // online, offline
+    private String username, status, statusMessage;
     private byte[] profilePic;
-    private String statusMessage;
 
     public User(int id, String username) {
         this.id = id;
